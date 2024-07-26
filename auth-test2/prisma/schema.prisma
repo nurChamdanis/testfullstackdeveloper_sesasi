@@ -1,0 +1,42 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int     @id @default(autoincrement())
+  email    String  @unique
+  name     String?
+  password String 
+}
+
+model Type_user {
+  id   Int    @id @default(autoincrement())
+  desc String
+}
+
+model Type_approval {
+  id   Int    @id @default(autoincrement())
+  desc String
+}
+
+model Approval {
+  id            Int    @id @default(autoincrement())
+  desc_approval String
+  status_verf   String
+  user_id       Int
+  type_approval Int
+}
+
+model Detail_user {
+  id        Int    @id @default(autoincrement())
+  id_type   String 
+  id_user   String 
+}
