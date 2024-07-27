@@ -20,7 +20,27 @@ const ProfilePage = async (props: Props) => {
   });
   const user = await response.json();
   console.log({ user });
+  
+  const r_type = await fetch(Backend_URL + `/user/type/all/0`, {
+    method: "GET",
+    headers: {
+      authorization: `Bearer ${session?.backendTokens.accessToken}`,
+      "Content-Type": "application/json",
+    },
+  });
+  const res_type = await r_type.json();
+  console.log({ res_type });
 
+  const saveUpdate = async () => {
+    const r_type = await fetch(Backend_URL + `/user/type/all/0`, {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${session?.backendTokens.accessToken}`,
+        "Content-Type": "application/json",
+      }, 
+    });
+    const res_type = await r_type.json(); 
+  }
 
   return (
     <div className="border rounded shadow overflow-hidden" >
@@ -30,8 +50,7 @@ const ProfilePage = async (props: Props) => {
       <div className="grid ">
         <form>
           <div>
-            <label>Name &nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;</label>
-            <br></br>
+            <label>Name &nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;</label> 
             <input name="username" placeholder="" value={user[0].name} type="text" />
           </div>
           <div>
@@ -41,10 +60,15 @@ const ProfilePage = async (props: Props) => {
           <div>
             <label>Type</label>
             <select>
-              <option></option>
+              <option>{user[0].detail_type}</option>
+              {res_type.map((type: any) => (
+                <option key={type.id} value={type.id}>
+                  {type.desc}
+                </option>
+              ))}
             </select>
           </div> 
-          
+          <button type="submit" onClick={saveUpdate}>save</button>
         </form>
       </div>
     </div>
