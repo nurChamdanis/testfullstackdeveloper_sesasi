@@ -1,12 +1,22 @@
+'use client';
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { Backend_URL } from "@/lib/Constants";
 import { getServerSession } from "next-auth";
 import '../../../../css/pages.css' ;
+import InputBox from "@/components/InputBox";
+import React, { useRef } from "react";
 
 type Props = {
   params: {
     id: string;
   };
+};
+ 
+type FormInputs = {
+  name: string;
+  email: string;
+  id_type: string;
+  id_user: string;
 };
 
 const ProfilePage = async (props: Props) => {
@@ -32,34 +42,74 @@ const ProfilePage = async (props: Props) => {
   console.log({ res_type });
 
   const saveUpdate = async () => {
-    const r_type = await fetch(Backend_URL + `/user/type/all/0`, {
+    const res = await fetch(Backend_URL + "/user/update", {
       method: "POST",
+      body: JSON.stringify({
+        name: data.current.name,
+        email: data.current.email,
+        id_type: data.current.id_type,
+      }),
       headers: {
-        authorization: `Bearer ${session?.backendTokens.accessToken}`,
         "Content-Type": "application/json",
-      }, 
+      },
     });
-    const res_type = await r_type.json(); 
+    if (!res.ok) {
+      alert(res.statusText);
+      return;
+    }
+    const response = await res.json();
+    alert("User Updated!");
+    console.log({ response });
+
   }
 
+  const data = useRef<FormInputs>({
+    name: "",
+    email: "",
+    id_type: "",
+    id_user: "",
+  });
   return (
     <div className="border rounded shadow overflow-hidden" >
       <div className="bg-gradient-to-b from-white to-slate-200 text-slate-600 text-center">
         Edit Profile {user.name}
       </div>
       <div className="grid ">
-        <form>
+        <form onSubmit={saveUpdate}>
+            <InputBox
+              hidden
+              autoComplete="off"
+              name="name"
+              labelText="Name"
+              required
+              value={user[0].id} type="text"
+              onChange={(e) => (data.current.id_user = e.target.value)}
+            />
           <div>
-            <label>Name &nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;</label> 
-            <input name="username" placeholder="" value={user[0].name} type="text" />
+            <label>Name &nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;</label>
+            <InputBox
+              autoComplete="off"
+              name="name"
+              labelText="Name"
+              required
+              value={user[0].name} type="text"
+              onChange={(e) => (data.current.name = e.target.value)}
+            />
           </div>
           <div>
             <label>Email &nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;</label>
-            <input name="email" placeholder="" value={user[0].email} type="email" />
+            <InputBox
+              autoComplete="off"
+              name="email"
+              labelText="email"
+              required
+              value={user[0].email} type="email"
+              onChange={(e) => (data.current.email = e.target.value)}
+            />
           </div>
           <div>
             <label>Type</label>
-            <select>
+            <select name="id_type">
               <option>{user[0].detail_type}</option>
               {res_type.map((type: any) => (
                 <option key={type.id} value={type.id}>
@@ -67,8 +117,8 @@ const ProfilePage = async (props: Props) => {
                 </option>
               ))}
             </select>
-          </div> 
-          <button type="submit" onClick={saveUpdate}>save</button>
+          </div>
+          <button type="submit">Save</button>
         </form>
       </div>
     </div>
