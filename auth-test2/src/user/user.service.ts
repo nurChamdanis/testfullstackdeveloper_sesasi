@@ -66,26 +66,39 @@ export class UserService {
   }
   
   async findAll(id: number) {
+    var wherecon = '';
     if (id === 0) {
-      // Return all users if id is 0
-      return await this.prisma.user.findMany();
+      // Return a specific user if id is greater than 0
+      const user = await this.prisma.$queryRaw(Prisma.sql`
+        SELECT 
+        a.id as id,
+        b.id as id_user,
+        b.email,
+        b.name,
+        c.desc AS detail_type,
+        c.id as id_type
+        FROM detail_user a
+        LEFT JOIN User b ON b.id = a.id_user
+        LEFT JOIN Type_user c ON c.id = a.id_type
+        `); 
+      return user;
     } else {
       // Return a specific user if id is greater than 0
       const user = await this.prisma.$queryRaw(Prisma.sql`
         SELECT 
-          a.id as id,
-          b.id as id_user,
-          b.email,
-          b.name,
-          c.desc AS detail_type,
-          c.id as id_type
+        a.id as id,
+        b.id as id_user,
+        b.email,
+        b.name,
+        c.desc AS detail_type,
+        c.id as id_type
         FROM detail_user a
         LEFT JOIN User b ON b.id = a.id_user
         LEFT JOIN Type_user c ON c.id = a.id_type
-          where b.id=${id}
-      `); 
+        where b.id=${id}
+        `); 
 
-      if (!user) {
+        if (!user) {
         throw new NotFoundException(`User with id ${id} not found`);
       }
 

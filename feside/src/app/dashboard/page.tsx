@@ -7,8 +7,8 @@ import React, { useEffect, useState } from "react";
 interface Item {
   id: number;
   email: string;
+  name: string;
   detail_type: string;
-  type: string;
 }
 
 const DashboardPage = () => {
@@ -34,6 +34,9 @@ const DashboardPage = () => {
   return (
     <div>
       <h1>Dashboard</h1>
+      <div>
+        <Link href={`/form`}>Add New</Link>
+      </div>
       <table>
         <thead>
           <tr>
@@ -48,8 +51,8 @@ const DashboardPage = () => {
             <tr key={item.id}>
               <td>{item.id}</td>
               <td>{item.email}</td>
+              <td>{item.name}</td>
               <td>{item.detail_type}</td>
-              <td>{item.type}</td>
               <td>
                 <Link href={`/dashboard/edit/${item.id}`}>Edit</Link>
               </td>

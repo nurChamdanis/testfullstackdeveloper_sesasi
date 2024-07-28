@@ -53,8 +53,8 @@ const Editpage = (props: Props) => {
 
   const update = async () => {
     const _id_detail = $("#id_detail").val()?.toString();
-    const _id_type = $("#id_user").val()?.toString();
-    const _id_user = $("#id_type option:selected").val()?.toString();
+    const _id_type = $("#id_type option:selected").val()?.toString();
+    const _id_user = $("#id_user").val()?.toString();
     var id_detail = _id_detail;
     var id_type = parseInt(_id_type==undefined?'':_id_type);
     var id_user = parseInt(_id_user==undefined?'':_id_user);
@@ -80,7 +80,7 @@ const Editpage = (props: Props) => {
       return;
     }
     const response = await res.json();
-    alert("User Registered!");
+    alert("User updated!");
     location.href = "/dashboard";
     console.log({ response });
   }; 
