@@ -1,9 +1,9 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { CreateUserDto } from './dto/dto/CreateUser.dto';
-import { hash } from 'bcrypt';
+import { hash } from 'bcrypt'; 
 import { Prisma } from '@prisma/client';
-import { UpdateUserDto } from './dto/dto/UpdateUser.dto';
+import { UpdateUserDto } from './dto/dto/UpdateTypeUser.dto';
 
 @Injectable()
 export class UserService {
@@ -96,22 +96,24 @@ export class UserService {
   async updateUser(dto: UpdateUserDto) {
     var result = {};
     const detail_user = await this.prisma.$queryRaw(Prisma.sql`
-      select * 
+      select count(*) 
       from detail_user 
       where id_type=${dto.id_type} and id_user=${dto.id_user}
-      `);
-
-    if (detail_user) throw new ConflictException('user find duplicated');
-
+      `) as number;
+    
+    if(detail_user > 0){
+      throw new ConflictException('user find duplicated');
+    }
+    
     try{
     const updates = await this.prisma.$queryRaw(Prisma.sql`
       update 
-      set id_type=${dto.id_type}
       detail_user
-      where id_user=${dto.id_user}`); 
+      set id_type=${dto.id_type}
+      where id=${dto.id_detail}`); 
       result = {status: 200, data: [], message: 'update success !'};
     }catch(error){
-      result = {status: 400, data: [], message: 'update success !'};
+      result = {status: 400, data: [], message: error};
     }
     return result;
   }

@@ -1,10 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
-import { Button } from "@/components/Button";
+import { Button } from "@/components/Button"; 
 import InputBox from "@/components/InputBox";
-import { Backend_URL } from "@/lib/Constants";
+import { Backend_URL } from "@/lib/Constants"; 
 import Link from "next/link";
-import $ from "jquery"; // Import jQuery
+import React, { useRef, useEffect, useCallback, useState } from "react";
+import $ from 'jquery';
 
 type FormInputs = {
   id: string;
@@ -22,13 +22,13 @@ type UserData = {
   id_user: string;
   name: string;
   email: string;
-  password: string;
+  password: string; 
   detail_type: string;
 };
 
 type TypeUser = {
-  id: string;
-  desc: string;
+  id: string; 
+  desc: string; 
 };
 
 type Props = {
@@ -37,10 +37,11 @@ type Props = {
   };
 };
 
+
 const Editpage = (props: Props) => {
   const [userList, setUserList] = useState<UserData[]>([]);
   const [typeUserList, setTypeUserList] = useState<TypeUser[]>([]);
-  const [formData, setFormData] = useState<FormInputs>({
+  const data = useRef<FormInputs>({
     id: "",
     id_type: "",
     id_user: "",
@@ -51,14 +52,24 @@ const Editpage = (props: Props) => {
   });
 
   const update = async () => {
-    console.log(formData);
-
+    const _id_detail = $("#id_detail").val()?.toString();
+    const _id_type = $("#id_user").val()?.toString();
+    const _id_user = $("#id_type option:selected").val()?.toString();
+    var id_detail = _id_detail;
+    var id_type = parseInt(_id_type==undefined?'':_id_type);
+    var id_user = parseInt(_id_user==undefined?'':_id_user);
+    var name = $("#name").val();
+    var email = $("#email").val();
+    
     const res = await fetch(Backend_URL + "/user/update", {
       method: "POST",
       body: JSON.stringify({
-        id: formData.id,
-        id_type: formData.id_type,
-        id_user: formData.id_user,
+        id_detail: id_detail,
+        id_type: id_type,
+        id_user: id_user,
+        name: name,
+        email: email, 
+        password: ""
       }),
       headers: {
         "Content-Type": "application/json",
@@ -70,120 +81,102 @@ const Editpage = (props: Props) => {
     }
     const response = await res.json();
     alert("User Registered!");
+    window.location.href = "/dashboard";
     console.log({ response });
-  };
-
-  async function fetchData() {
-    try {
-      const response = await fetch(Backend_URL + `/user/all/${props.params.id}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const userData: UserData[] = await response.json();
-      console.log({ userData });
-      setUserList(userData);
-      if (userData.length > 0) {
-        setFormData({
-          ...formData,
-          ...userData[0] // Assume you want to pre-fill the form with the first user data
-        });
-      }
+  }; 
+  async function fetchData() { 
+    try{
+    const response = await fetch(Backend_URL + `/user/all/${props.params.id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const userData: UserData[] = await response.json();
+    console.log({ userData });
+    setUserList(userData);
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
-  }
-
-  async function fetchTypeUser() {
-    try {
+  } 
+  async function fetchTypeUser() { 
+    try{
       const response = await fetch(Backend_URL + `/user/type/all`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const typeUser: TypeUser[] = await response.json();
-      console.log({ typeUser });
-      setTypeUserList(typeUser);
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const typeUser: TypeUser[] = await response.json();
+    console.log({ typeUser });
+    setTypeUserList(typeUser);
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
-  }
-
+  } 
   useEffect(() => {
     fetchData();
-    fetchTypeUser();
+    fetchTypeUser(); 
+    
   }, []);
-
-  useEffect(() => {
-    // Example of using jQuery to handle a specific DOM manipulation
-    $("#type").change(function () {
-      console.log("Selected value:", $(this).val());
-    });
-  }, [userList, typeUserList]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prevData => ({
-      ...prevData,
-      [name]: value
-    }));
-  };
 
   return (
     <div className="m-2 border rounded overflow-hidden shadow">
       <div className="p-2 bg-gradient-to-b from-white to-slate-200 text-slate-600">
-        Edit
+        Edit  
       </div>
       <div className="p-2 flex flex-col gap-6">
         {userList.map((user) => (
-          <div key={user.id}>
-            <input
+          <div key={user.id}> 
+            <input 
               hidden
-              id="id"
-              name="id"
+              id="id_detail" 
+              name="id_detail" 
               value={user.id}
-              onChange={(e) => setFormData({ ...formData, id: e.target.value })}
-            />
-            <input
+              onChange={(e) => (data.current.id = e.target.value)} 
+            /> 
+            <input 
               hidden
-              name="id_type"
-              value={user.id_type}
-              onChange={(e) => setFormData({ ...formData, id_type: e.target.value })}
-            />
-            <div>
+              id="id_user" 
+              name="id_user" 
+              value={user.id}
+              onChange={(e) => (data.current.id_user = e.target.value)} 
+            /> 
+            <div> 
               <InputBox
-                id="isname"
+                id="name"
                 autoComplete="off"
                 name="name"
                 labelText="Name"
                 required
-                value={formData.name}
-                onChange={handleChange}
+                value={user.name}
+                onChange={(e) => (data.current.name = e.target.value)} 
               />
-            </div>
-            <div>
+           </div>
+            <div> 
               <InputBox
-                id="isEmail"
+                id="email"
                 autoComplete="off"
                 name="email"
                 labelText="Email"
                 required
-                value={formData.email}
-                onChange={handleChange}
-              />
-            </div>
+                value={user.email}
+                onChange={(e) => (data.current.email = e.target.value)} 
+                />
+           </div>
           </div>
         ))}
-        <div>
+        <div> 
           <label>Type</label>
-          <select id="type" name="id_type" value={formData.id_type} onChange={handleChange}>
+        <select id="id_type"> 
+            {userList.map((user) => (
+              <option key={user.id} value={user.id_type}>{user.detail_type}</option>
+            ))} 
             <option value="">-- Pilih --</option>
             {typeUserList.map((type) => (
               <option key={type.id} value={type.id}>{type.desc}</option>
             ))}
-          </select>
+        </select>
         </div>
         <div className="flex justify-center items-center gap-2">
           <Button onClick={update}>Submit</Button>
