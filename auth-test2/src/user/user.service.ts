@@ -45,14 +45,23 @@ export class UserService {
   }
 
   async findById(id: number) {
-    return await this.prisma.user.findUnique({
-      where: {
-        id: id,
-      },
-    });
+    const user = await this.prisma.$queryRaw(Prisma.sql`
+        SELECT 
+          a.id,
+          b.id_user,
+          b.email,
+          b.name,
+          c.desc AS detail_type,
+          c.id as id_type
+        FROM detail_user a
+        LEFT JOIN User b ON b.id = a.id_type
+        LEFT JOIN Type_user c ON c.id = a.id_user
+          where a.id=${id}
+      `); 
+    return user;
   }
   
-  async findAllType(id: number){
+  async findAllType(){
     return await this.prisma.type_user.findMany();
   }
   
@@ -64,15 +73,16 @@ export class UserService {
       // Return a specific user if id is greater than 0
       const user = await this.prisma.$queryRaw(Prisma.sql`
         SELECT 
-          b.id,
+          a.id as id,
+          b.id as id_user,
           b.email,
           b.name,
           c.desc AS detail_type,
           c.id as id_type
         FROM detail_user a
-        LEFT JOIN User b ON b.id = a.id_type
-        LEFT JOIN Type_user c ON c.id = a.id_user
-          where a.id=${id}
+        LEFT JOIN User b ON b.id = a.id_user
+        LEFT JOIN Type_user c ON c.id = a.id_type
+          where b.id=${id}
       `); 
 
       if (!user) {

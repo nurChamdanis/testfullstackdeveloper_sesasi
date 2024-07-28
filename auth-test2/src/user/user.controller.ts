@@ -3,6 +3,7 @@ import { UserService } from './user.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { CreateUserDto } from './dto/dto/CreateUser.dto';
 import { UpdateUserDto } from './dto/dto/UpdateUser.dto';
+import { TypeUser } from './dto/dto/type_user.dto';
 
 @Controller('user')
 export class UserController {
@@ -19,12 +20,12 @@ export class UserController {
     return await this.userService.findAll(id);
   }
   
-  @Get('/type/all/:id')
-  async getAllTypeUser(@Param('id') id: number) {
-    return await this.userService.findAllType(id);
+  @Get('/type/all')
+  async getAllTypeUser() {
+    return await this.userService.findAllType();
   }
 
-  @Post('user/update')
+  @Post('/update')
   async registerUser(@Body() dto: UpdateUserDto) {
     return await this.userService.updateUser(dto);
   }
