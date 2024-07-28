@@ -81,7 +81,7 @@ const Editpage = (props: Props) => {
     }
     const response = await res.json();
     alert("User Registered!");
-    window.location.href = "/dashboard";
+    location.href = "/dashboard";
     console.log({ response });
   }; 
   async function fetchData() { 

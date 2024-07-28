@@ -7,7 +7,7 @@ import React, { useEffect, useState } from "react";
 interface Item {
   id: number;
   email: string;
-  name: string;
+  detail_type: string;
   type: string;
 }
 
@@ -48,7 +48,7 @@ const DashboardPage = () => {
             <tr key={item.id}>
               <td>{item.id}</td>
               <td>{item.email}</td>
-              <td>{item.name}</td>
+              <td>{item.detail_type}</td>
               <td>{item.type}</td>
               <td>
                 <Link href={`/dashboard/edit/${item.id}`}>Edit</Link>
